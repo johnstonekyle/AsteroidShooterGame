@@ -11,6 +11,7 @@ var score = 0;
 var bullets = 3;
 var mx = 0;
 var my = 0;
+var gameover = false;
 
 var player = {
     x: WIDTH/2,
@@ -51,8 +52,8 @@ var arrow = new Image();
 arrow.onload = function() {
 	drawArrow(0);
 };
-arrow.src = 'https://cdn3.iconfinder.com/data/icons/google-material-design-icons/48/ic_keyboard_arrow_down_48px-128.png';
-arrow.height = 50;
+arrow.src = 'arrow.png';
+arrow.height = -150;
 
 function drawArrow(angle) {
     var dx = mx - player.x;
@@ -71,7 +72,6 @@ function drawArrow(angle) {
 document.onmousemove = function(e) {
     mx = e.pageX;
     my = e.pageY;
-    arrowAngle = theta;
 };
 
 function onCanvasClick(ev){
@@ -84,7 +84,9 @@ function onCanvasClick(ev){
     vy = (dy / mag) * speed;
 
     if (bullets > 0){
-        bullets--;
+        if(score > 0){
+            bullets--;
+        }
         Bullet('bul'+idCounter++,player.x,player.y,vx,vy,5);
     }
 }
@@ -162,21 +164,36 @@ function drawObjects(){
     }
 }
 
+function showIntro(){
+    ctx.font = "15px Arial";
+    ctx.fillText('Shoot An Asteroid To Begin',WIDTH/2-90,HEIGHT/2+50);
+}
+
 function updateScore(){
-    ctx.fillStyle = "#FFFFFF";
-    ctx.font = "30px Arial";
-    ctx.fillText('score: ' + score + ", bullets: " + bullets,10,30);
+    if(!gameover){
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "30px Arial";
+        ctx.fillText('score: ' + score + ", bullets: " + bullets,10,30);
+    } else {
+        ctx.font = "30px Arial";
+        ctx.fillText('Game Over',WIDTH/2-60,HEIGHT/2-15);
+        ctx.font = "15px Arial";
+        ctx.fillText('Score: ' + score,WIDTH/2-15,HEIGHT/2+10);
+    }
 }
 
 function main(){
     ctx.clearRect(0,0,WIDTH,HEIGHT);
+    if(score <= 0){
+        showIntro();
+    }
+    drawArrow(arrowAngle);
     checkCollision();
     drawObjects();
     generateAsteroid();
-	drawArrow(arrowAngle);
     updateScore();
     if ((player.x < 0 || player.x > WIDTH || player.y < 0 || player.y > HEIGHT) && Object.keys(bulletList).length <= 0){
-        ctx.fillText('Game Over',WIDTH/2-60,HEIGHT/2-15);
+        gameover = true;
     }
 }
 
